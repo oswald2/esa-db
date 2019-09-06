@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 4f818fa5342934fbfaa290e34e074089f048ce72d0aeba306c2dff63d1d6bfdf
+-- hash: 2365df57d8c753ef026db8d7df1fce61228ffa95f54a41a2ec4a45bd507f016e
 
 name:           esa-db
 version:        0.1.0.0
@@ -28,8 +28,8 @@ source-repository head
 library
   exposed-modules:
       App
+      AppEnv
       Db
-      DbLogging
       EventLog
   other-modules:
       Paths_esa_db

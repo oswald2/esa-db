@@ -43,10 +43,13 @@ runQ cRef (S f) = do
     (_, c') <- runStateT f c
     writeIORef cRef c'
 
-logToSQLiteDatabase :: FilePath -> IO (EventLog -> IO (), IO ())
-logToSQLiteDatabase fp = do
-    cRef <- sqliteOpen fp >>= newIORef
+tryCreateEventLogTable :: IORef (SeldaConnection c) -> IO ()
+tryCreateEventLogTable cRef = do
     let run = runQ cRef
     run $ tryCreateTable eventLogTable
-    pure $ (run . insert_ eventLogTable . pure, readIORef cRef >>= seldaClose)
+
+insertEventLog :: IORef (SeldaConnection c) -> EventLog -> IO ()
+insertEventLog cRef e = do
+    let run = runQ cRef
+    run . insert_ eventLogTable . pure $ e
 

@@ -7,7 +7,6 @@ import RIO
 import Data.Text
 import Data.Time
 
-type EventLogger = EventLog -> IO ()
 
 data EventLog = EventLog
     { utcTime :: UTCTime
