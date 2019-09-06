@@ -9,6 +9,7 @@ module DbLogging where
 import           Data.Text as T
 import           Data.Time
 import           RIO
+import App
 import EventLog
 
 
@@ -18,12 +19,6 @@ prependLogger log app = do
             time <- getCurrentTime
             log $ EventLog time ll $ textDisplay t
     local (over logFuncL $ mappend lf) app
-
-data Logging a = Logging
-    { appLogFunc :: LogFunc
-    , applicationCtx :: a
-    }
-
 
 instance HasLogFunc (Logging a) where
     logFuncL :: Lens' (Logging a) LogFunc
