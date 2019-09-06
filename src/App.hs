@@ -13,17 +13,24 @@ import AppEnv
 import EventLog
 
 runIO :: RIO (AppEnv () (SeldaConnection SQLite)) () -> IO ()
-runIO app = do
-    (termLogger, killTermLogger) <- setupTermLogger
-    (dbRef, killDb) <- setupDb "test.db"
+runIO app =
+    withTermLogger $ \termLogger ->
+        withDb "test.db" $ \dbRef ->
+            withDbLogger dbRef $ \dbLogger -> do
+                let loggers = mappend termLogger dbLogger
+                let appEnv = AppEnv loggers dbRef ()
+                runRIO appEnv app
+
+withTermLogger :: (LogFunc -> IO ()) -> IO ()
+withTermLogger a = bracket setupTermLogger snd (a . fst)
+
+withDb :: FilePath -> (IORef (SeldaConnection SQLite) -> IO ()) -> IO ()
+withDb fp a = bracket (setupDb fp) snd (a . fst)
+
+withDbLogger :: IORef (SeldaConnection SQLite) -> (LogFunc -> IO ())-> IO ()
+withDbLogger dbRef a =
     let dbLogger = setupDbLogger dbRef
-
-    let loggers = mappend termLogger dbLogger
-    let appEnv = AppEnv loggers dbRef ()
-    runRIO appEnv app
-
-    killDb
-    killTermLogger
+    in a dbLogger
 
 setupTermLogger :: IO (LogFunc, IO ())
 setupTermLogger = do
